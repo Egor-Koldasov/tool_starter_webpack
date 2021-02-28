@@ -1,0 +1,41 @@
+{
+  "name": "tool_starter_webpack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run build && concurrently -n wpc,wps,ws \"npm run watch_client\" \"npm run watch_server\" \"npm run dev_server_start\"",
+    "build_client": "webpack --config ./src/config/client-webpack.config.js",
+    "build_server": "webpack --config ./src/config/server-webpack.config.js",
+    "build": "concurrently -n bc,bs \"npm run build_client\" \"npm run build_server\"",
+    "watch_client": "webpack --watch --config ./src/config/client-webpack.config.js",
+    "watch_server": "webpack --watch --config ./src/config/server-webpack.config.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server_start": "node ./dist/server/index.js",
+    "dev_server_start": "nodemon --inspect=0.0.0.0:9229 ./dist/server/index.js"
+  },
+  "author": "Egor Koldasov",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.11",
+    "@types/react": "^17.0.2",
+    "@types/react-dom": "^17.0.1",
+    "@types/react-router-dom": "^5.1.7",
+    "clean-webpack-plugin": "^3.0.0",
+    "concurrently": "^5.3.0",
+    "html-webpack-plugin": "^5.1.0",
+    "nodemon": "^2.0.7",
+    "ts-loader": "^8.0.17",
+    "typescript": "^4.1.5",
+    "webpack": "^5.23.0",
+    "webpack-cli": "^4.5.0",
+    "webpack-node-externals": "^2.5.2"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-loadable": "^5.5.0",
+    "react-router-dom": "^5.2.0"
+  }
+}

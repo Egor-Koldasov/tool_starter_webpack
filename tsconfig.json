@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "outDir": "dist",
+    "jsx": "react",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/bundle/**/*.ts",
+    "src/bundle/**/*.tsx",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+} 
