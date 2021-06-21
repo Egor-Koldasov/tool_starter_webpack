@@ -1,6 +1,10 @@
 import ReactDOM from "react-dom";
 import React from 'react';
 import { ClientRouter } from "./router/client";
+import { preloadReady } from "react-loadable";
 const appEl = document.getElementById('appRoot');
 
-ReactDOM.hydrate(<ClientRouter/>, appEl);
+(async function() {
+  await preloadReady();
+  ReactDOM.hydrate(<ClientRouter/>, appEl);
+})();

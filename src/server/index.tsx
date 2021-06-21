@@ -3,9 +3,12 @@ import path from 'path';
 import ReactDOMServer from 'react-dom/server';
 import fs from 'fs';
 import util from 'util';
-import React from 'react';
+import React, { Component } from 'react';
 import {ServerRouter} from "../bundle/router/server";
 import {StaticRouterContext} from "react-router";
+import { getBundles } from 'react-loadable-ssr-addon';
+import manifest from '../../dist/client/loadable-assets-manifest.json';
+import {Capture, preloadAll} from 'react-loadable';
 
 const port = 3000;
 
@@ -22,8 +25,19 @@ const app = express();
 
 app.use('/bundle', express.static(bundlePath));
 app.get(/.*/, async (req, res, next) => {
+  await preloadAll();
   const context: StaticRouterContext = {};
-  const appHtml = ReactDOMServer.renderToString(<ServerRouter context={context} url={req.url}/>);
+  const modules = new Set();
+  const appHtml = ReactDOMServer.renderToString(
+    <Capture report={moduleName => {
+      console.log('capture', moduleName);
+      modules.add(moduleName);
+    }}>
+      <ServerRouter context={context} url={req.url}/>
+    </Capture>
+  );
+  const modulesToBeLoaded = [...manifest.entrypoints, ...Array.from(modules)];
+  const bundles = getBundles(manifest, modulesToBeLoaded);
   if (context.url) {
     res.writeHead(301, {Location: context.url});
     res.end();
@@ -35,8 +49,22 @@ app.get(/.*/, async (req, res, next) => {
       '<body>',
       `<body><div id="appRoot">${appHtml}</div>`
     );
-
-  res.write(indexHtmlFilled);
+  console.log('modules', modules);
+  res.write(`
+    <!doctype html>
+    <html lang="en">
+      <head>
+        ${(bundles.css || []).map(style => {
+          return `<link href="/bundle/${style.file}" rel="stylesheet" />`;
+        }).join('\n')}
+      </head>
+      <body>
+        <div id="appRoot">${appHtml}</div>
+        ${(bundles.js || []).map(script => {
+          return `<script src="/bundle/${script.file}"></script>`
+        }).join('\n')}
+    </html>
+  `);
   res.end();
   return next();
 });
